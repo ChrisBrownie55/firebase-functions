@@ -23,8 +23,11 @@
 import * as mockRequire from 'mock-require';
 import { expect } from 'chai';
 import { config, firebaseConfig } from '../src/config';
+import { resolve } from 'path';
 
 describe('config()', () => {
+  const runtimeConfigPath = resolve('.runtimeconfig.json');
+
   afterEach(() => {
     mockRequire.stopAll();
     delete config.singleton;
@@ -34,19 +37,19 @@ describe('config()', () => {
   });
 
   it('loads config values from .runtimeconfig.json', () => {
-    mockRequire('../../../.runtimeconfig.json', { foo: 'bar', firebase: {} });
+    mockRequire(runtimeConfigPath, { foo: 'bar', firebase: {} });
     let loaded = config();
     expect(loaded).to.not.have.property('firebase');
     expect(loaded).to.have.property('foo', 'bar');
   });
 
   it('does not provide firebase config if .runtimeconfig.json not invalid', () => {
-    mockRequire('../../../.runtimeconfig.json', 'does-not-exist');
+    mockRequire(runtimeConfigPath, 'does-not-exist');
     expect(firebaseConfig()).to.be.null;
   });
 
   it('does not provide firebase config if .ruuntimeconfig.json has no firebase property', () => {
-    mockRequire('../../../.runtimeconfig.json', {});
+    mockRequire(runtimeConfigPath, {});
     expect(firebaseConfig()).to.be.null;
   });
 
@@ -84,7 +87,7 @@ describe('config()', () => {
     process.env.FIREBASE_PROJECT = JSON.stringify({
       databaseURL: 'foo@firebaseio.com',
     });
-    mockRequire('../../../.runtimeconfig.json', {
+    mockRequire(runtimeConfigPath, {
       firebase: {
         databaseURL: 'foo@firebaseio.com',
       },
