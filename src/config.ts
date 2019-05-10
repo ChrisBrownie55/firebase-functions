@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 import * as firebase from 'firebase-admin';
+import { resolve } from 'path';
 
 export function config(): config.Config {
   if (typeof config.singleton === 'undefined') {
@@ -32,7 +33,9 @@ export function config(): config.Config {
 export namespace config {
   // Config type is usable as a object (dot notation allowed), and firebase
   // property will also code complete.
-  export type Config = { [key: string]: any };
+  export interface Config {
+    [key: string]: any;
+  }
 
   /** @internal */
   export let singleton: config.Config;
@@ -84,8 +87,8 @@ function init() {
   }
 
   try {
-    let path =
-      process.env.CLOUD_RUNTIME_CONFIG || '../../../.runtimeconfig.json';
+    const path =
+      process.env.CLOUD_RUNTIME_CONFIG || resolve('.runtimeconfig.json');
     const parsed = require(path);
     delete parsed.firebase;
     config.singleton = parsed;
